@@ -38,9 +38,15 @@ def scan(path: Path, output_dir: Path) -> None:
     click.echo(f"Scanning {root} ({len(python_files)} Python file(s))...")
 
     scorers = [ComplexityScorer(), LintScorer()]
+    lint_scorer = next(s for s in scorers if isinstance(s, LintScorer))
     scored = []
 
     for file_path in python_files:
+        relative = str(file_path.relative_to(root))
+        # Prime lint diagnostics against the real file (with full import/class
+        # context) once per file, rather than re-running ruff per isolated
+        # chunk — see LintScorer docstring for why this matters for accuracy.
+        lint_scorer.prime_file(file_path, relative)
         for chunk in extract_chunks_from_file(file_path, relative_to=root):
             scores = aggregate_scores(chunk, scorers)
             scored.append(scored_chunk_from_scores(chunk, scores))
