@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 import textwrap
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 
 
 @dataclass(frozen=True)
@@ -27,6 +27,28 @@ class Chunk:
     start_line: int
     end_line: int
     docstring: str | None = None
+
+
+def is_test_chunk(chunk: Chunk) -> bool:
+    """Return True when a chunk appears to be test code."""
+    path = PurePath(chunk.file)
+    basename = path.name
+    parts = {part for part in path.parts if part not in {".", ""}}
+
+    if any(part in {"test", "tests"} for part in parts):
+        return True
+    if basename.startswith("test_") or basename.endswith("_test.py"):
+        return True
+
+    function_name = chunk.function_name
+    if function_name.startswith("test_"):
+        return True
+    if "." in function_name:
+        class_name = function_name.split(".", 1)[0]
+        if class_name.startswith("Test"):
+            return True
+
+    return False
 
 
 def extract_chunks(source: str, file_path: str | Path) -> list[Chunk]:

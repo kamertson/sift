@@ -38,6 +38,8 @@ class ScoredChunk:
 def write_outputs(
     scored: Sequence[ScoredChunk],
     output_dir: str | Path,
+    *,
+    test_chunks_excluded: int = 0,
 ) -> tuple[Path, Path]:
     """Write ``dataset.jsonl`` and ``report.json`` under *output_dir*.
 
@@ -61,16 +63,23 @@ def write_outputs(
         for item in scored:
             handle.write(json.dumps(item.to_record(), ensure_ascii=False) + "\n")
 
-    report = build_report(scored)
+    report = build_report(scored, test_chunks_excluded=test_chunks_excluded)
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return dataset_path, report_path
 
 
-def build_report(scored: Sequence[ScoredChunk]) -> dict[str, Any]:
+def build_report(
+    scored: Sequence[ScoredChunk],
+    *,
+    test_chunks_excluded: int = 0,
+) -> dict[str, Any]:
     """Build summary statistics and top/bottom exemplars for *scored*."""
+    total_extracted = len(scored) + test_chunks_excluded
     if not scored:
         return {
             "total_chunks": 0,
+            "test_chunks_excluded": test_chunks_excluded,
+            "test_chunk_ratio": _round_ratio(test_chunks_excluded, total_extracted),
             "score_distribution": {"min": None, "max": None, "mean": None, "median": None},
             "top_5_highest": [],
             "top_5_lowest": [],
@@ -89,6 +98,8 @@ def build_report(scored: Sequence[ScoredChunk]) -> dict[str, Any]:
 
     return {
         "total_chunks": n,
+        "test_chunks_excluded": test_chunks_excluded,
+        "test_chunk_ratio": _round_ratio(test_chunks_excluded, total_extracted),
         "small_sample_warning": (
             "Fewer than 10 chunks scored; top/bottom exemplars are limited to "
             f"{k} each to avoid overlap and may not be statistically meaningful."
@@ -102,11 +113,19 @@ def build_report(scored: Sequence[ScoredChunk]) -> dict[str, Any]:
             "median": statistics.median(finals),
         },
         "top_5_highest": [_exemplar(item) for item in ranked_high[:k]],
-        "top_5_lowest": [_exemplar(item, include_reasons=True) for item in ranked_low[:k]],
+        "top_5_lowest": [
+            _exemplar(item, include_reasons=True, small_sample=small_sample)
+            for item in ranked_low[:k]
+        ],
     }
 
 
-def _exemplar(item: ScoredChunk, *, include_reasons: bool = False) -> dict[str, Any]:
+def _exemplar(
+    item: ScoredChunk,
+    *,
+    include_reasons: bool = False,
+    small_sample: bool = False,
+) -> dict[str, Any]:
     """Compact summary of a scored chunk for the report."""
     payload: dict[str, Any] = {
         "file": item.chunk.file,
@@ -118,11 +137,11 @@ def _exemplar(item: ScoredChunk, *, include_reasons: bool = False) -> dict[str, 
         "final_score": item.final_score,
     }
     if include_reasons:
-        payload["reasons"] = _reasons_for_low_score(item)
+        payload["reasons"] = _reasons_for_low_score(item, small_sample=small_sample)
     return payload
 
 
-def _reasons_for_low_score(item: ScoredChunk) -> list[str]:
+def _reasons_for_low_score(item: ScoredChunk, *, small_sample: bool = False) -> list[str]:
     """Human-readable hints explaining why a chunk scored poorly.
 
     Note: with a small total chunk count, a chunk can land in the "lowest"
@@ -139,13 +158,26 @@ def _reasons_for_low_score(item: ScoredChunk) -> list[str]:
     if item.lint_score < 50:
         reasons.append(f"High lint violation pressure ({item.lint_score:.1f}/100)")
     if not reasons and item.final_score >= 70:
-        reasons.append(
-            f"No quality issues detected (final score {item.final_score:.1f}/100); "
-            "appears here only due to small sample size"
-        )
+        if small_sample:
+            reasons.append(
+                f"No quality issues detected (final score {item.final_score:.1f}/100); "
+                "appears here only due to small sample size"
+            )
+        else:
+            reasons.append(
+                f"No significant quality issues detected (final score {item.final_score:.1f}/100); "
+                "ranks lowest only relative to other chunks in this dataset."
+            )
     elif not reasons:
         reasons.append("Below peer average on combined quality signals")
     return reasons
+
+
+def _round_ratio(numerator: int, denominator: int) -> float | None:
+    """Return a rounded ratio or ``None`` when the denominator is zero."""
+    if denominator == 0:
+        return None
+    return round(numerator / denominator, 3)
 
 
 def scored_chunk_from_scores(chunk: Chunk, scores: dict[str, float]) -> ScoredChunk:

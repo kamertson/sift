@@ -1,4 +1,4 @@
-"""Discover Python source files in a local path or git repository."""
+"""Discover source files in a local path or git repository."""
 
 from __future__ import annotations
 
@@ -33,11 +33,12 @@ SKIP_DIR_NAMES: frozenset[str] = frozenset(
 )
 
 
-def ingest(path: str | Path) -> tuple[Path, list[Path]]:
+def ingest(path: str | Path, languages: set[str] | None = None) -> tuple[Path, list[Path]]:
     """Resolve *path* and return ``(root, python_files)``.
 
-    Walks the target directory, finds ``.py`` files, skips common junk
-    directories, and respects ``.gitignore`` patterns when present.
+    Walks the target directory, finds files matching the requested language
+    set, skips common junk directories, and respects ``.gitignore`` patterns
+    when present.
 
     If *path* points at a git working tree, files reported by ``git ls-files``
     are preferred (already gitignore-aware). Otherwise a filesystem walk with
@@ -48,7 +49,7 @@ def ingest(path: str | Path) -> tuple[Path, list[Path]]:
 
     Returns:
         A tuple of the resolved root directory and a sorted list of absolute
-        paths to Python files under that root.
+        paths to source files under that root.
     """
     root = Path(path).expanduser().resolve()
     if not root.exists():
@@ -56,23 +57,28 @@ def ingest(path: str | Path) -> tuple[Path, list[Path]]:
     if not root.is_dir():
         raise NotADirectoryError(f"Path is not a directory: {root}")
 
+    suffixes = _language_suffixes(languages)
+    if not suffixes:
+        return root, []
+
     try:
-        files = _ingest_via_git(root)
+        files = _ingest_via_git(root, suffixes)
     except InvalidGitRepositoryError:
-        files = _ingest_via_walk(root)
+        files = _ingest_via_walk(root, suffixes)
 
     return root, sorted(files)
 
 
-def _ingest_via_git(root: Path) -> list[Path]:
-    """List tracked (and optionally untracked) ``.py`` files via GitPython."""
+def _ingest_via_git(root: Path, suffixes: set[str]) -> list[Path]:
+    """List tracked files matching *suffixes* via GitPython."""
     repo = Repo(root, search_parent_directories=True)
     # Ensure we only return files under the requested root even if Repo
     # discovered a parent git directory.
     repo_root = Path(repo.working_tree_dir or root).resolve()
 
     # Tracked files only — matches what gitignore would leave visible.
-    relative_paths = repo.git.ls_files("--", "*.py").splitlines()
+    patterns = [f"*{suffix}" for suffix in sorted(suffixes)]
+    relative_paths = repo.git.ls_files("--", *patterns).splitlines()
     files: list[Path] = []
     for rel in relative_paths:
         if not rel:
@@ -89,7 +95,7 @@ def _ingest_via_git(root: Path) -> list[Path]:
     return files
 
 
-def _ingest_via_walk(root: Path) -> list[Path]:
+def _ingest_via_walk(root: Path, suffixes: set[str]) -> list[Path]:
     """Walk the filesystem, applying skip dirs and ``.gitignore`` patterns."""
     gitignore_patterns = _load_gitignore_patterns(root)
     files: list[Path] = []
@@ -104,7 +110,7 @@ def _ingest_via_walk(root: Path) -> list[Path]:
         ]
 
         for name in filenames:
-            if not name.endswith(".py"):
+            if Path(name).suffix not in suffixes:
                 continue
             path = current / name
             if _is_ignored(path, root, gitignore_patterns):
@@ -169,3 +175,17 @@ def _is_ignored(path: Path, root: Path, patterns: list[str]) -> bool:
             return True
 
     return False
+
+
+def _language_suffixes(languages: set[str] | None) -> set[str]:
+    """Return the set of file suffixes associated with *languages*."""
+    requested = languages or {"python"}
+    suffixes: set[str] = set()
+    mapping = {
+        "python": {".py"},
+        "javascript": {".js", ".jsx"},
+        "typescript": {".ts", ".tsx"},
+    }
+    for language in requested:
+        suffixes.update(mapping.get(language, set()))
+    return suffixes

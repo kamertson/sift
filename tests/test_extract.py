@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from sift.extract import Chunk, extract_chunks, extract_chunks_from_file
+from sift.extract import Chunk, extract_chunks, extract_chunks_from_file, is_test_chunk
 
 FIXTURES = Path(__file__).resolve().parent.parent / "fixtures" / "sample_repo"
 
@@ -47,3 +47,63 @@ def test_extract_chunks_from_sample_repo_files() -> None:
     # good_code: 2 top-level funcs; messy_code: 2; mixed: 1 top-level + 2 methods
     assert len(all_chunks) == 7
     assert {c.file for c in all_chunks} == {"good_code.py", "messy_code.py", "mixed.py"}
+
+
+def test_is_test_chunk_for_pytest_style_function() -> None:
+    chunk = Chunk(
+        code="def test_foo():\n    assert True\n",
+        file="example.py",
+        function_name="test_foo",
+        start_line=1,
+        end_line=2,
+    )
+
+    assert is_test_chunk(chunk)
+
+
+def test_is_test_chunk_for_unittest_style_method() -> None:
+    chunk = Chunk(
+        code="def test_bar(self):\n    self.assertTrue(True)\n",
+        file="example.py",
+        function_name="TestFoo.test_bar",
+        start_line=1,
+        end_line=2,
+    )
+
+    assert is_test_chunk(chunk)
+
+
+def test_is_test_chunk_for_tests_directory_file() -> None:
+    chunk = Chunk(
+        code="def helper():\n    return 1\n",
+        file="tests/test_conf.py",
+        function_name="helper",
+        start_line=1,
+        end_line=2,
+    )
+
+    assert is_test_chunk(chunk)
+
+
+def test_is_test_chunk_for_test_file_pattern() -> None:
+    chunk = Chunk(
+        code="def helper():\n    return 1\n",
+        file="module_test.py",
+        function_name="helper",
+        start_line=1,
+        end_line=2,
+    )
+
+    assert is_test_chunk(chunk)
+
+
+def test_is_test_chunk_for_normal_production_function() -> None:
+    chunk = Chunk(
+        code="def helper():\n    return 1\n",
+        file="src/app.py",
+        function_name="helper",
+        start_line=1,
+        end_line=2,
+    )
+
+    assert not is_test_chunk(chunk)
