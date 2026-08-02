@@ -15,7 +15,12 @@ def test_ingest_includes_js_ts_files_when_requested(tmp_path: Path) -> None:
     root, files = ingest(repo, languages={"javascript", "typescript"})
 
     assert root == repo.resolve()
-    assert sorted(path.name for path in files) == ["basic.js", "component.jsx", "typed.ts"]
+    assert sorted(path.name for path in files) == [
+        "assignments.js",
+        "basic.js",
+        "component.jsx",
+        "typed.ts",
+    ]
 
 
 def test_ingest_defaults_to_python_only() -> None:

@@ -1,0 +1,1226 @@
+{
+  "total_files_scanned": 141,
+  "total_chunks_extracted": 133,
+  "files_with_zero_chunks": 95,
+  "files_with_zero_chunks_sample": [
+    "examples/content-negotiation/db.js",
+    "examples/cookie-sessions/index.js",
+    "examples/cookies/index.js",
+    "examples/downloads/index.js",
+    "examples/ejs/index.js",
+    "examples/error-pages/index.js",
+    "examples/hello-world/index.js",
+    "examples/markdown/index.js",
+    "examples/multi-router/controllers/api_v1.js",
+    "examples/multi-router/controllers/api_v2.js",
+    "examples/multi-router/index.js",
+    "examples/mvc/db.js",
+    "examples/params/index.js",
+    "examples/route-separation/index.js",
+    "examples/search/public/client.js",
+    "examples/session/index.js",
+    "examples/session/redis.js",
+    "examples/static-files/index.js",
+    "examples/static-files/public/js/app.js",
+    "examples/vhost/index.js"
+  ],
+  "chunks": [
+    {
+      "file": "examples/auth/index.js",
+      "function_name": "authenticate",
+      "start_line": 60,
+      "end_line": 73,
+      "line_count": 14,
+      "has_docstring": false,
+      "code_preview": "function authenticate(name, pass, fn) {\n  if (!module.parent) console.log('authenticating %s:%s', name, pass);\n  var user = users[name];\n  // query the db for the given username\n  if (!user) return fn"
+    },
+    {
+      "file": "examples/auth/index.js",
+      "function_name": "restrict",
+      "start_line": 75,
+      "end_line": 82,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "function restrict(req, res, next) {\n  if (req.session.user) {\n    next();\n  } else {\n    req.session.error = 'Access denied!';\n    res.redirect('/login');\n  }\n}"
+    },
+    {
+      "file": "examples/content-negotiation/index.js",
+      "function_name": "format",
+      "start_line": 33,
+      "end_line": 38,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "function format(path) {\n  var obj = require(path);\n  return function(req, res){\n    res.format(obj);\n  };\n}"
+    },
+    {
+      "file": "examples/content-negotiation/users.js",
+      "function_name": "html",
+      "start_line": 5,
+      "end_line": 9,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "exports.html = function(req, res){\n  res.send('<ul>' + users.map(function(user){\n    return '<li>' + user.name + '</li>';\n  }).join('') + '</ul>');\n};"
+    },
+    {
+      "file": "examples/content-negotiation/users.js",
+      "function_name": "text",
+      "start_line": 11,
+      "end_line": 15,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "exports.text = function(req, res){\n  res.send(users.map(function(user){\n    return ' - ' + user.name + '\\n';\n  }).join(''));\n};"
+    },
+    {
+      "file": "examples/content-negotiation/users.js",
+      "function_name": "json",
+      "start_line": 17,
+      "end_line": 19,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.json = function(req, res){\n  res.json(users);\n};"
+    },
+    {
+      "file": "examples/error/index.js",
+      "function_name": "error",
+      "start_line": 20,
+      "end_line": 27,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "function error(err, req, res, next) {\n  // log it\n  if (!test) console.error(err.stack);\n\n  // respond with 500 \"Internal Server Error\".\n  res.status(500);\n  res.send('Internal Server Error');\n}"
+    },
+    {
+      "file": "examples/mvc/controllers/main/index.js",
+      "function_name": "index",
+      "start_line": 3,
+      "end_line": 5,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.index = function(req, res){\n  res.redirect('/users');\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/pet/index.js",
+      "function_name": "before",
+      "start_line": 11,
+      "end_line": 16,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "exports.before = function(req, res, next){\n  var pet = db.pets[req.params.pet_id];\n  if (!pet) return next('route');\n  req.pet = pet;\n  next();\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/pet/index.js",
+      "function_name": "show",
+      "start_line": 18,
+      "end_line": 20,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.show = function(req, res, next){\n  res.render('show', { pet: req.pet });\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/pet/index.js",
+      "function_name": "edit",
+      "start_line": 22,
+      "end_line": 24,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.edit = function(req, res, next){\n  res.render('edit', { pet: req.pet });\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/pet/index.js",
+      "function_name": "update",
+      "start_line": 26,
+      "end_line": 31,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "exports.update = function(req, res, next){\n  var body = req.body;\n  req.pet.name = body.pet.name;\n  res.message('Information updated!');\n  res.redirect('/pet/' + req.pet.id);\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/user/index.js",
+      "function_name": "before",
+      "start_line": 11,
+      "end_line": 22,
+      "line_count": 12,
+      "has_docstring": false,
+      "code_preview": "exports.before = function(req, res, next){\n  var id = req.params.user_id;\n  if (!id) return next();\n  // pretend to query a database...\n  process.nextTick(function(){\n    req.user = db.users[id];\n    "
+    },
+    {
+      "file": "examples/mvc/controllers/user/index.js",
+      "function_name": "list",
+      "start_line": 24,
+      "end_line": 26,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.list = function(req, res, next){\n  res.render('list', { users: db.users });\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/user/index.js",
+      "function_name": "edit",
+      "start_line": 28,
+      "end_line": 30,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.edit = function(req, res, next){\n  res.render('edit', { user: req.user });\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/user/index.js",
+      "function_name": "show",
+      "start_line": 32,
+      "end_line": 34,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.show = function(req, res, next){\n  res.render('show', { user: req.user });\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/user/index.js",
+      "function_name": "update",
+      "start_line": 36,
+      "end_line": 41,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "exports.update = function(req, res, next){\n  var body = req.body;\n  req.user.name = body.user.name;\n  res.message('Information updated!');\n  res.redirect('/user/' + req.user.id);\n};"
+    },
+    {
+      "file": "examples/mvc/controllers/user-pet/index.js",
+      "function_name": "create",
+      "start_line": 12,
+      "end_line": 22,
+      "line_count": 11,
+      "has_docstring": false,
+      "code_preview": "exports.create = function(req, res, next){\n  var id = req.params.user_id;\n  var user = db.users[id];\n  var body = req.body;\n  if (!user) return next('route');\n  var pet = { name: body.pet.name };\n  pe"
+    },
+    {
+      "file": "examples/mvc/index.js",
+      "function_name": "message",
+      "start_line": 24,
+      "end_line": 31,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "app.response.message = function(msg){\n  // reference `req.session` via the `this.req` reference\n  var sess = this.req.session;\n  // simply add the msg to an array for later\n  sess.messages = sess.mess"
+    },
+    {
+      "file": "examples/mvc/lib/boot.js",
+      "function_name": "exports",
+      "start_line": 11,
+      "end_line": 83,
+      "line_count": 73,
+      "has_docstring": false,
+      "code_preview": "module.exports = function(parent, options){\n  var dir = path.join(__dirname, '..', 'controllers');\n  var verbose = options.verbose;\n  fs.readdirSync(dir).forEach(function(name){\n    var file = path.jo"
+    },
+    {
+      "file": "examples/online/index.js",
+      "function_name": "list",
+      "start_line": 40,
+      "end_line": 44,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function list(ids) {\n  return '<ul>' + ids.map(function(id){\n    return '<li>' + id + '</li>';\n  }).join('') + '</ul>';\n}"
+    },
+    {
+      "file": "examples/resource/index.js",
+      "function_name": "resource",
+      "start_line": 13,
+      "end_line": 26,
+      "line_count": 14,
+      "has_docstring": false,
+      "code_preview": "app.resource = function(path, obj) {\n  this.get(path, obj.index);\n  this.get(path + '/:a..:b{.:format}', function(req, res){\n    var a = parseInt(req.params.a, 10);\n    var b = parseInt(req.params.b, "
+    },
+    {
+      "file": "examples/route-map/index.js",
+      "function_name": "map",
+      "start_line": 14,
+      "end_line": 29,
+      "line_count": 16,
+      "has_docstring": false,
+      "code_preview": "app.map = function(a, route){\n  route = route || '';\n  for (var key in a) {\n    switch (typeof a[key]) {\n      // { '/path': { ... }}\n      case 'object':\n        app.map(a[key], route + key);\n       "
+    },
+    {
+      "file": "examples/route-middleware/index.js",
+      "function_name": "loadUser",
+      "start_line": 25,
+      "end_line": 34,
+      "line_count": 10,
+      "has_docstring": false,
+      "code_preview": "function loadUser(req, res, next) {\n  // You would fetch your user from the db\n  var user = users[req.params.id];\n  if (user) {\n    req.user = user;\n    next();\n  } else {\n    next(new Error('Failed t"
+    },
+    {
+      "file": "examples/route-middleware/index.js",
+      "function_name": "andRestrictToSelf",
+      "start_line": 36,
+      "end_line": 48,
+      "line_count": 13,
+      "has_docstring": false,
+      "code_preview": "function andRestrictToSelf(req, res, next) {\n  // If our authenticated user is the user we are viewing\n  // then everything is fine :)\n  if (req.authenticatedUser.id === req.user.id) {\n    next();\n  }"
+    },
+    {
+      "file": "examples/route-middleware/index.js",
+      "function_name": "andRestrictTo",
+      "start_line": 50,
+      "end_line": 58,
+      "line_count": 9,
+      "has_docstring": false,
+      "code_preview": "function andRestrictTo(role) {\n  return function(req, res, next) {\n    if (req.authenticatedUser.role === role) {\n      next();\n    } else {\n      next(new Error('Unauthorized'));\n    }\n  }\n}"
+    },
+    {
+      "file": "examples/route-separation/post.js",
+      "function_name": "list",
+      "start_line": 11,
+      "end_line": 13,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.list = function(req, res){\n  res.render('posts', { title: 'Posts', posts: posts });\n};"
+    },
+    {
+      "file": "examples/route-separation/site.js",
+      "function_name": "index",
+      "start_line": 3,
+      "end_line": 5,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.index = function(req, res){\n  res.render('index', { title: 'Route Separation Example' });\n};"
+    },
+    {
+      "file": "examples/route-separation/user.js",
+      "function_name": "list",
+      "start_line": 10,
+      "end_line": 12,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "exports.list = function(req, res){\n  res.render('users', { title: 'Users', users: users });\n};"
+    },
+    {
+      "file": "examples/route-separation/user.js",
+      "function_name": "load",
+      "start_line": 14,
+      "end_line": 24,
+      "line_count": 11,
+      "has_docstring": false,
+      "code_preview": "exports.load = function(req, res, next){\n  var id = req.params.id;\n  req.user = users[id];\n  if (req.user) {\n    next();\n  } else {\n    var err = new Error('cannot find user ' + id);\n    err.status = "
+    },
+    {
+      "file": "examples/route-separation/user.js",
+      "function_name": "view",
+      "start_line": 26,
+      "end_line": 31,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "exports.view = function(req, res){\n  res.render('users/view', {\n    title: 'Viewing user ' + req.user.name,\n    user: req.user\n  });\n};"
+    },
+    {
+      "file": "examples/route-separation/user.js",
+      "function_name": "edit",
+      "start_line": 33,
+      "end_line": 38,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "exports.edit = function(req, res){\n  res.render('users/edit', {\n    title: 'Editing user ' + req.user.name,\n    user: req.user\n  });\n};"
+    },
+    {
+      "file": "examples/route-separation/user.js",
+      "function_name": "update",
+      "start_line": 40,
+      "end_line": 47,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "exports.update = function(req, res){\n  // Normally you would handle all kinds of\n  // validation and save back to the db\n  var user = req.body.user;\n  req.user.name = user.name;\n  req.user.email = use"
+    },
+    {
+      "file": "examples/search/index.js",
+      "function_name": "initializeRedis",
+      "start_line": 29,
+      "end_line": 46,
+      "line_count": 18,
+      "has_docstring": true,
+      "code_preview": "async function initializeRedis() {\n  try {\n    // connect to Redis\n\n    await db.connect();\n\n    // populate search\n\n    await db.sAdd('ferret', 'tobi');\n    await db.sAdd('ferret', 'loki');\n    await"
+    },
+    {
+      "file": "examples/view-constructor/github-view.js",
+      "function_name": "GithubView",
+      "start_line": 23,
+      "end_line": 30,
+      "line_count": 8,
+      "has_docstring": true,
+      "code_preview": "function GithubView(name, options){\n  this.name = name;\n  options = options || {};\n  this.engine = options.engines[extname(name)];\n  // \"root\" is the app.set('views') setting, however\n  // in your own"
+    },
+    {
+      "file": "examples/view-constructor/github-view.js",
+      "function_name": "GithubView.render",
+      "start_line": 36,
+      "end_line": 53,
+      "line_count": 18,
+      "has_docstring": true,
+      "code_preview": "GithubView.prototype.render = function(options, fn){\n  var self = this;\n  var opts = {\n    host: 'raw.githubusercontent.com',\n    port: 443,\n    path: this.path,\n    method: 'GET'\n  };\n\n  https.reques"
+    },
+    {
+      "file": "examples/view-locals/index.js",
+      "function_name": "ferrets",
+      "start_line": 17,
+      "end_line": 19,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "function ferrets(user) {\n  return user.species === 'ferret'\n}"
+    },
+    {
+      "file": "examples/view-locals/index.js",
+      "function_name": "count",
+      "start_line": 48,
+      "end_line": 54,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function count(req, res, next) {\n  User.count(function(err, count){\n    if (err) return next(err);\n    req.count = count;\n    next();\n  })\n}"
+    },
+    {
+      "file": "examples/view-locals/index.js",
+      "function_name": "users",
+      "start_line": 56,
+      "end_line": 62,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function users(req, res, next) {\n  User.all(function(err, users){\n    if (err) return next(err);\n    req.users = users;\n    next();\n  })\n}"
+    },
+    {
+      "file": "examples/view-locals/index.js",
+      "function_name": "count2",
+      "start_line": 86,
+      "end_line": 92,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function count2(req, res, next) {\n  User.count(function(err, count){\n    if (err) return next(err);\n    res.locals.count = count;\n    next();\n  })\n}"
+    },
+    {
+      "file": "examples/view-locals/index.js",
+      "function_name": "users2",
+      "start_line": 94,
+      "end_line": 100,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function users2(req, res, next) {\n  User.all(function(err, users){\n    if (err) return next(err);\n    res.locals.users = users.filter(ferrets);\n    next();\n  })\n}"
+    },
+    {
+      "file": "examples/view-locals/user.js",
+      "function_name": "User",
+      "start_line": 7,
+      "end_line": 11,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "function User(name, age, species) {\n  this.name = name;\n  this.age = age;\n  this.species = species;\n}"
+    },
+    {
+      "file": "examples/view-locals/user.js",
+      "function_name": "all",
+      "start_line": 13,
+      "end_line": 20,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "User.all = function(fn){\n  // process.nextTick makes sure this function API\n  // behaves in an asynchronous manner, like if it\n  // was a real DB query to read all users.\n  process.nextTick(function()"
+    },
+    {
+      "file": "examples/view-locals/user.js",
+      "function_name": "count",
+      "start_line": 22,
+      "end_line": 26,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "User.count = function(fn){\n  process.nextTick(function(){\n    fn(null, users.length);\n  });\n};"
+    },
+    {
+      "file": "examples/web-service/index.js",
+      "function_name": "error",
+      "start_line": 15,
+      "end_line": 19,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "function error(status, msg) {\n  var err = new Error(msg);\n  err.status = status;\n  return err;\n}"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "init",
+      "start_line": 59,
+      "end_line": 83,
+      "line_count": 25,
+      "has_docstring": true,
+      "code_preview": "app.init = function init() {\n  var router = null;\n\n  this.cache = Object.create(null);\n  this.engines = Object.create(null);\n  this.settings = Object.create(null);\n\n  this.defaultConfiguration();\n\n  /"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "defaultConfiguration",
+      "start_line": 90,
+      "end_line": 141,
+      "line_count": 52,
+      "has_docstring": true,
+      "code_preview": "app.defaultConfiguration = function defaultConfiguration() {\n  var env = process.env.NODE_ENV || 'development';\n\n  // default settings\n  this.enable('x-powered-by');\n  this.set('etag', 'weak');\n  this"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "handle",
+      "start_line": 152,
+      "end_line": 178,
+      "line_count": 27,
+      "has_docstring": true,
+      "code_preview": "app.handle = function handle(req, res, callback) {\n  // final handler\n  var done = callback || finalhandler(req, res, {\n    env: this.get('env'),\n    onerror: logerror.bind(this)\n  });\n\n  // set power"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "use",
+      "start_line": 190,
+      "end_line": 244,
+      "line_count": 55,
+      "has_docstring": true,
+      "code_preview": "app.use = function use(fn) {\n  var offset = 0;\n  var path = '/';\n\n  // default path to '/'\n  // disambiguate app.use([fn])\n  if (typeof fn !== 'function') {\n    var arg = fn;\n\n    while (Array.isArray"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "route",
+      "start_line": 256,
+      "end_line": 258,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "app.route = function route(path) {\n  return this.router.route(path);\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "engine",
+      "start_line": 294,
+      "end_line": 308,
+      "line_count": 15,
+      "has_docstring": true,
+      "code_preview": "app.engine = function engine(ext, fn) {\n  if (typeof fn !== 'function') {\n    throw new Error('callback function required');\n  }\n\n  // get file extension\n  var extension = ext[0] !== '.'\n    ? '.' + e"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "param",
+      "start_line": 322,
+      "end_line": 334,
+      "line_count": 13,
+      "has_docstring": true,
+      "code_preview": "app.param = function param(name, fn) {\n  if (Array.isArray(name)) {\n    for (var i = 0; i < name.length; i++) {\n      this.param(name[i], fn);\n    }\n\n    return this;\n  }\n\n  this.router.param(name, fn"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "set",
+      "start_line": 351,
+      "end_line": 383,
+      "line_count": 33,
+      "has_docstring": true,
+      "code_preview": "app.set = function set(setting, val) {\n  if (arguments.length === 1) {\n    // app.get(setting)\n    return this.settings[setting];\n  }\n\n  debug('set \"%s\" to %o', setting, val);\n\n  // set value\n  this.s"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "path",
+      "start_line": 399,
+      "end_line": 403,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "app.path = function path() {\n  return this.parent\n    ? this.parent.path() + this.mountpath\n    : '';\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "enabled",
+      "start_line": 420,
+      "end_line": 422,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "app.enabled = function enabled(setting) {\n  return Boolean(this.set(setting));\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "disabled",
+      "start_line": 439,
+      "end_line": 441,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "app.disabled = function disabled(setting) {\n  return !this.set(setting);\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "enable",
+      "start_line": 451,
+      "end_line": 453,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "app.enable = function enable(setting) {\n  return this.set(setting, true);\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "disable",
+      "start_line": 463,
+      "end_line": 465,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "app.disable = function disable(setting) {\n  return this.set(setting, false);\n};"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "all",
+      "start_line": 494,
+      "end_line": 503,
+      "line_count": 10,
+      "has_docstring": true,
+      "code_preview": "app.all = function all(path) {\n  var route = this.route(path);\n  var args = slice.call(arguments, 1);\n\n  for (var i = 0; i < methods.length; i++) {\n    route[methods[i]].apply(route, args);\n  }\n\n  ret"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "render",
+      "start_line": 522,
+      "end_line": 575,
+      "line_count": 54,
+      "has_docstring": true,
+      "code_preview": "app.render = function render(name, options, callback) {\n  var cache = this.cache;\n  var done = callback;\n  var engines = this.engines;\n  var opts = options || {};\n  var view;\n\n  // support callback fu"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "listen",
+      "start_line": 598,
+      "end_line": 606,
+      "line_count": 9,
+      "has_docstring": true,
+      "code_preview": "app.listen = function listen() {\n  var server = http.createServer(this)\n  var args = slice.call(arguments)\n  if (typeof args[args.length - 1] === 'function') {\n    var done = args[args.length - 1] = o"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "logerror",
+      "start_line": 615,
+      "end_line": 618,
+      "line_count": 4,
+      "has_docstring": true,
+      "code_preview": "function logerror(err) {\n  /* istanbul ignore next */\n  if (this.get('env') !== 'test') console.error(err);\n}"
+    },
+    {
+      "file": "lib/application.js",
+      "function_name": "tryRender",
+      "start_line": 625,
+      "end_line": 631,
+      "line_count": 7,
+      "has_docstring": true,
+      "code_preview": "function tryRender(view, options, callback) {\n  try {\n    view.render(options, callback);\n  } catch (err) {\n    callback(err);\n  }\n}"
+    },
+    {
+      "file": "lib/express.js",
+      "function_name": "createApplication",
+      "start_line": 36,
+      "end_line": 56,
+      "line_count": 21,
+      "has_docstring": true,
+      "code_preview": "function createApplication() {\n  var app = function(req, res, next) {\n    app.handle(req, res, next);\n  };\n\n  mixin(app, EventEmitter.prototype, false);\n  mixin(app, proto, false);\n\n  // expose the pr"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "accepts",
+      "start_line": 127,
+      "end_line": 130,
+      "line_count": 4,
+      "has_docstring": true,
+      "code_preview": "req.accepts = function(){\n  var accept = accepts(this);\n  return accept.types.apply(accept, arguments);\n};"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "acceptsEncodings",
+      "start_line": 140,
+      "end_line": 143,
+      "line_count": 4,
+      "has_docstring": true,
+      "code_preview": "req.acceptsEncodings = function(){\n  var accept = accepts(this);\n  return accept.encodings.apply(accept, arguments);\n};"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "acceptsCharsets",
+      "start_line": 171,
+      "end_line": 174,
+      "line_count": 4,
+      "has_docstring": true,
+      "code_preview": "req.acceptsCharsets = function(...charsets) {\n  const accept = accepts(this);\n  return accept.charsets(...charsets);\n};"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "acceptsLanguages",
+      "start_line": 185,
+      "end_line": 187,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "req.acceptsLanguages = function(...languages) {\n  return accepts(this).languages(...languages);\n};"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "range",
+      "start_line": 214,
+      "end_line": 218,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "req.range = function range(size, options) {\n  var range = this.get('Range');\n  if (!range) return;\n  return parseRange(size, range, options);\n};"
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "is",
+      "start_line": 269,
+      "end_line": 281,
+      "line_count": 13,
+      "has_docstring": true,
+      "code_preview": "req.is = function is(types) {\n  var arr = types;\n\n  // support flattened arguments\n  if (!Array.isArray(types)) {\n    arr = new Array(arguments.length);\n    for (var i = 0; i < arr.length; i++) {\n    "
+    },
+    {
+      "file": "lib/request.js",
+      "function_name": "defineGetter",
+      "start_line": 521,
+      "end_line": 527,
+      "line_count": 7,
+      "has_docstring": true,
+      "code_preview": "function defineGetter(obj, name, getter) {\n  Object.defineProperty(obj, name, {\n    configurable: true,\n    enumerable: true,\n    get: getter\n  });\n}"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "status",
+      "start_line": 65,
+      "end_line": 77,
+      "line_count": 13,
+      "has_docstring": true,
+      "code_preview": "res.status = function status(code) {\n  // Check if the status code is not an integer\n  if (!Number.isInteger(code)) {\n    throw new TypeError(`Invalid status code: ${JSON.stringify(code)}. Status code"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "links",
+      "start_line": 98,
+      "end_line": 111,
+      "line_count": 14,
+      "has_docstring": true,
+      "code_preview": "res.links = function(links) {\n  var link = this.get('Link') || '';\n  if (link) link += ', ';\n  return this.set('Link', link + Object.keys(links).map(function(rel) {\n    // Allow multiple links if link"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "send",
+      "start_line": 126,
+      "end_line": 220,
+      "line_count": 95,
+      "has_docstring": true,
+      "code_preview": "res.send = function send(body) {\n  var chunk = body;\n  var encoding;\n  var req = this.req;\n\n  // settings\n  var app = this.app;\n\n  switch (typeof chunk) {\n    // string defaulting to html\n    case 'st"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "json",
+      "start_line": 234,
+      "end_line": 248,
+      "line_count": 15,
+      "has_docstring": true,
+      "code_preview": "res.json = function json(obj) {\n  // settings\n  var app = this.app;\n  var escape = app.get('json escape')\n  var replacer = app.get('json replacer');\n  var spaces = app.get('json spaces');\n  var body ="
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "jsonp",
+      "start_line": 262,
+      "end_line": 306,
+      "line_count": 45,
+      "has_docstring": true,
+      "code_preview": "res.jsonp = function jsonp(obj) {\n  // settings\n  var app = this.app;\n  var escape = app.get('json escape')\n  var replacer = app.get('json replacer');\n  var spaces = app.get('json spaces');\n  var body"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "sendStatus",
+      "start_line": 323,
+      "end_line": 330,
+      "line_count": 8,
+      "has_docstring": true,
+      "code_preview": "res.sendStatus = function sendStatus(statusCode) {\n  var body = statuses.message[statusCode] || String(statusCode)\n\n  this.status(statusCode);\n  this.type('txt');\n\n  return this.send(body);\n};"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "sendFile",
+      "start_line": 373,
+      "end_line": 415,
+      "line_count": 43,
+      "has_docstring": true,
+      "code_preview": "res.sendFile = function sendFile(path, options, callback) {\n  var done = callback;\n  var req = this.req;\n  var res = this;\n  var next = req.next;\n  var opts = options || {};\n\n  if (!path) {\n    throw "
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "download",
+      "start_line": 435,
+      "end_line": 484,
+      "line_count": 50,
+      "has_docstring": true,
+      "code_preview": "res.download = function download (path, filename, options, callback) {\n  var done = callback;\n  var name = filename;\n  var opts = options || null\n\n  // support function as second or third arg\n  if (ty"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "format",
+      "start_line": 571,
+      "end_line": 596,
+      "line_count": 26,
+      "has_docstring": true,
+      "code_preview": "res.format = function(obj){\n  var req = this.req;\n  var next = req.next;\n\n  var keys = Object.keys(obj)\n    .filter(function (v) { return v !== 'default' })\n\n  var key = keys.length > 0\n    ? req.acce"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "attachment",
+      "start_line": 606,
+      "end_line": 615,
+      "line_count": 10,
+      "has_docstring": true,
+      "code_preview": "res.attachment = function attachment(filename) {\n  const name = filename !== undefined ? basename(filename) : undefined;\n  if (name) {\n    this.type(extname(name));\n  }\n\n  this.set('Content-Dispositio"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "append",
+      "start_line": 632,
+      "end_line": 644,
+      "line_count": 13,
+      "has_docstring": true,
+      "code_preview": "res.append = function append(field, val) {\n  var prev = this.get(field);\n  var value = val;\n\n  if (prev) {\n    // concat the new and prev vals\n    value = Array.isArray(prev) ? prev.concat(val)\n      "
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "get",
+      "start_line": 699,
+      "end_line": 701,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "res.get = function(field){\n  return this.getHeader(field);\n};"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "clearCookie",
+      "start_line": 712,
+      "end_line": 719,
+      "line_count": 8,
+      "has_docstring": true,
+      "code_preview": "res.clearCookie = function clearCookie(name, options) {\n  // Force cookie expiration by setting expires to the past\n  const opts = { path: '/', ...options, expires: new Date(1)};\n  // ensure maxAge is"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "cookie",
+      "start_line": 745,
+      "end_line": 778,
+      "line_count": 34,
+      "has_docstring": true,
+      "code_preview": "res.cookie = function (name, value, options) {\n  var opts = { ...options };\n  var secret = this.req.secret;\n  var signed = opts.signed;\n\n  if (signed && !secret) {\n    throw new Error('cookieParser(\"s"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "location",
+      "start_line": 797,
+      "end_line": 799,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "res.location = function location(url) {\n  return this.set('Location', encodeUrl(url));\n};"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "redirect",
+      "start_line": 815,
+      "end_line": 867,
+      "line_count": 53,
+      "has_docstring": true,
+      "code_preview": "res.redirect = function redirect(url) {\n  var address = url;\n  var body;\n  var status = 302;\n\n  // allow status / url\n  if (arguments.length === 2) {\n    status = arguments[0]\n    address = arguments["
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "vary",
+      "start_line": 878,
+      "end_line": 882,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "res.vary = function(field){\n  vary(this, field);\n\n  return this;\n};"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "render",
+      "start_line": 897,
+      "end_line": 921,
+      "line_count": 25,
+      "has_docstring": true,
+      "code_preview": "res.render = function render(view, options, callback) {\n  var app = this.req.app;\n  var done = callback;\n  var opts = options || {};\n  var req = this.req;\n  var self = this;\n\n  // support callback fun"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "sendfile",
+      "start_line": 924,
+      "end_line": 1012,
+      "line_count": 89,
+      "has_docstring": false,
+      "code_preview": "function sendfile(res, file, options, callback) {\n  var done = false;\n  var streaming;\n\n  // request aborted\n  function onaborted() {\n    if (done) return;\n    done = true;\n\n    var err = new Error('R"
+    },
+    {
+      "file": "lib/response.js",
+      "function_name": "stringify",
+      "start_line": 1026,
+      "end_line": 1050,
+      "line_count": 25,
+      "has_docstring": true,
+      "code_preview": "function stringify (value, replacer, spaces, escape) {\n  // v8 checks arguments.length for optimizing simple call\n  // https://bugs.chromium.org/p/v8/issues/detail?id=4730\n  var json = replacer || spa"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "normalizeType",
+      "start_line": 61,
+      "end_line": 65,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "exports.normalizeType = function(type){\n  return ~type.indexOf('/')\n    ? acceptParams(type)\n    : { value: (mime.lookup(type) || 'application/octet-stream'), params: {} }\n};"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "normalizeTypes",
+      "start_line": 75,
+      "end_line": 77,
+      "line_count": 3,
+      "has_docstring": true,
+      "code_preview": "exports.normalizeTypes = function(types) {\n  return types.map(exports.normalizeType);\n};"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "acceptParams",
+      "start_line": 89,
+      "end_line": 120,
+      "line_count": 32,
+      "has_docstring": true,
+      "code_preview": "function acceptParams (str) {\n  var length = str.length;\n  var colonIndex = str.indexOf(';');\n  var index = colonIndex === -1 ? length : colonIndex;\n  var ret = { value: str.slice(0, index).trim(), qu"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "compileETag",
+      "start_line": 130,
+      "end_line": 152,
+      "line_count": 23,
+      "has_docstring": true,
+      "code_preview": "exports.compileETag = function(val) {\n  var fn;\n\n  if (typeof val === 'function') {\n    return val;\n  }\n\n  switch (val) {\n    case true:\n    case 'weak':\n      fn = exports.wetag;\n      break;\n    cas"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "compileQueryParser",
+      "start_line": 162,
+      "end_line": 184,
+      "line_count": 23,
+      "has_docstring": true,
+      "code_preview": "exports.compileQueryParser = function compileQueryParser(val) {\n  var fn;\n\n  if (typeof val === 'function') {\n    return val;\n  }\n\n  switch (val) {\n    case true:\n    case 'simple':\n      fn = queryst"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "compileTrust",
+      "start_line": 194,
+      "end_line": 214,
+      "line_count": 21,
+      "has_docstring": true,
+      "code_preview": "exports.compileTrust = function(val) {\n  if (typeof val === 'function') return val;\n\n  if (val === true) {\n    // Support plain true/false\n    return function(){ return true };\n  }\n\n  if (typeof val ="
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "setCharset",
+      "start_line": 225,
+      "end_line": 238,
+      "line_count": 14,
+      "has_docstring": true,
+      "code_preview": "exports.setCharset = function setCharset(type, charset) {\n  if (!type || !charset) {\n    return type;\n  }\n\n  // parse type\n  var parsed = contentType.parse(type);\n\n  // set charset\n  parsed.parameters"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "createETagGenerator",
+      "start_line": 249,
+      "end_line": 257,
+      "line_count": 9,
+      "has_docstring": true,
+      "code_preview": "function createETagGenerator (options) {\n  return function generateETag (body, encoding) {\n    var buf = !Buffer.isBuffer(body)\n      ? Buffer.from(body, encoding)\n      : body\n\n    return etag(buf, o"
+    },
+    {
+      "file": "lib/utils.js",
+      "function_name": "parseExtendedQueryString",
+      "start_line": 267,
+      "end_line": 271,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function parseExtendedQueryString(str) {\n  return qs.parse(str, {\n    allowPrototypes: true\n  });\n}"
+    },
+    {
+      "file": "lib/view.js",
+      "function_name": "View",
+      "start_line": 52,
+      "end_line": 95,
+      "line_count": 44,
+      "has_docstring": true,
+      "code_preview": "function View(name, options) {\n  var opts = options || {};\n\n  this.defaultEngine = opts.defaultEngine;\n  this.ext = extname(name);\n  this.name = name;\n  this.root = opts.root;\n\n  if (!this.ext && !thi"
+    },
+    {
+      "file": "lib/view.js",
+      "function_name": "View.lookup",
+      "start_line": 104,
+      "end_line": 123,
+      "line_count": 20,
+      "has_docstring": true,
+      "code_preview": "View.prototype.lookup = function lookup(name) {\n  var path;\n  var roots = [].concat(this.root);\n\n  debug('lookup \"%s\"', name);\n\n  for (var i = 0; i < roots.length && !path; i++) {\n    var root = roots"
+    },
+    {
+      "file": "lib/view.js",
+      "function_name": "View.render",
+      "start_line": 133,
+      "end_line": 159,
+      "line_count": 27,
+      "has_docstring": true,
+      "code_preview": "View.prototype.render = function render(options, callback) {\n  var sync = true;\n\n  debug('render \"%s\"', this.path);\n\n  // render, normalizing sync callbacks\n  this.engine(this.path, options, function "
+    },
+    {
+      "file": "lib/view.js",
+      "function_name": "View.resolve",
+      "start_line": 169,
+      "end_line": 187,
+      "line_count": 19,
+      "has_docstring": true,
+      "code_preview": "View.prototype.resolve = function resolve(dir, file) {\n  var ext = this.ext;\n\n  // <path>.<ext>\n  var path = join(dir, file);\n  var stat = tryStat(path);\n\n  if (stat && stat.isFile()) {\n    return pat"
+    },
+    {
+      "file": "lib/view.js",
+      "function_name": "tryStat",
+      "start_line": 197,
+      "end_line": 205,
+      "line_count": 9,
+      "has_docstring": true,
+      "code_preview": "function tryStat(path) {\n  debug('stat \"%s\"', path);\n\n  try {\n    return fs.statSync(path);\n  } catch (e) {\n    return undefined;\n  }\n}"
+    },
+    {
+      "file": "test/acceptance/auth.js",
+      "function_name": "getCookie",
+      "start_line": 4,
+      "end_line": 6,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "function getCookie(res) {\n  return res.headers['set-cookie'][0].split(';')[0];\n}"
+    },
+    {
+      "file": "test/acceptance/cookie-sessions.js",
+      "function_name": "getCookies",
+      "start_line": 34,
+      "end_line": 38,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "function getCookies(res) {\n  return res.headers['set-cookie'].map(function (val) {\n    return val.split(';')[0]\n  }).join('; ');\n}"
+    },
+    {
+      "file": "test/app.engine.js",
+      "function_name": "render",
+      "start_line": 8,
+      "end_line": 14,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function render(path, options, fn) {\n  fs.readFile(path, 'utf8', function(err, str){\n    if (err) return fn(err);\n    str = str.replace('{{user.name}}', options.user.name);\n    fn(null, str);\n  });\n}"
+    },
+    {
+      "file": "test/app.render.js",
+      "function_name": "createApp",
+      "start_line": 386,
+      "end_line": 392,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function createApp() {\n  var app = express();\n\n  app.engine('.tmpl', tmpl);\n\n  return app;\n}"
+    },
+    {
+      "file": "test/app.router.js",
+      "function_name": "supportsRegexp",
+      "start_line": 1210,
+      "end_line": 1217,
+      "line_count": 8,
+      "has_docstring": false,
+      "code_preview": "function supportsRegexp(source) {\n  try {\n    new RegExp(source)\n    return true\n  } catch (e) {\n    return false\n  }\n}"
+    },
+    {
+      "file": "test/express.json.js",
+      "function_name": "createApp",
+      "start_line": 722,
+      "end_line": 740,
+      "line_count": 19,
+      "has_docstring": false,
+      "code_preview": "function createApp (options) {\n  var app = express()\n\n  app.use(express.json(options))\n\n  app.use(function (err, req, res, next) {\n    // console.log(err)\n    res.status(err.status || 500)\n    res.sen"
+    },
+    {
+      "file": "test/express.json.js",
+      "function_name": "parseError",
+      "start_line": 742,
+      "end_line": 748,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function parseError (str) {\n  try {\n    JSON.parse(str); throw new SyntaxError('strict violation')\n  } catch (e) {\n    return e.message\n  }\n}"
+    },
+    {
+      "file": "test/express.json.js",
+      "function_name": "shouldContainInBody",
+      "start_line": 750,
+      "end_line": 755,
+      "line_count": 6,
+      "has_docstring": false,
+      "code_preview": "function shouldContainInBody (str) {\n  return function (res) {\n    assert.ok(res.text.indexOf(str) !== -1,\n      'expected \\'' + res.text + '\\' to contain \\'' + str + '\\'')\n  }\n}"
+    },
+    {
+      "file": "test/express.raw.js",
+      "function_name": "createApp",
+      "start_line": 492,
+      "end_line": 513,
+      "line_count": 22,
+      "has_docstring": false,
+      "code_preview": "function createApp (options) {\n  var app = express()\n\n  app.use(express.raw(options))\n\n  app.use(function (err, req, res, next) {\n    res.status(err.status || 500)\n    res.send(String(req.headers['x-e"
+    },
+    {
+      "file": "test/express.static.js",
+      "function_name": "createApp",
+      "start_line": 804,
+      "end_line": 815,
+      "line_count": 12,
+      "has_docstring": false,
+      "code_preview": "function createApp (dir, options, fn) {\n  var app = express()\n  var root = dir || fixtures\n\n  app.use(express.static(root, options))\n\n  app.use(function (req, res, next) {\n    res.sendStatus(404)\n  })"
+    },
+    {
+      "file": "test/express.text.js",
+      "function_name": "createApp",
+      "start_line": 549,
+      "end_line": 566,
+      "line_count": 18,
+      "has_docstring": false,
+      "code_preview": "function createApp (options) {\n  var app = express()\n\n  app.use(express.text(options))\n\n  app.use(function (err, req, res, next) {\n    res.status(err.status || 500)\n    res.send(String(req.headers['x-"
+    },
+    {
+      "file": "test/express.urlencoded.js",
+      "function_name": "createManyParams",
+      "start_line": 788,
+      "end_line": 803,
+      "line_count": 16,
+      "has_docstring": false,
+      "code_preview": "function createManyParams (count) {\n  var str = ''\n\n  if (count === 0) {\n    return str\n  }\n\n  str += '0=0'\n\n  for (var i = 1; i < count; i++) {\n    var n = i.toString(36)\n    str += '&' + n + '=' + n"
+    },
+    {
+      "file": "test/express.urlencoded.js",
+      "function_name": "createApp",
+      "start_line": 805,
+      "end_line": 822,
+      "line_count": 18,
+      "has_docstring": false,
+      "code_preview": "function createApp (options) {\n  var app = express()\n\n  app.use(express.urlencoded(options))\n\n  app.use(function (err, req, res, next) {\n    res.status(err.status || 500)\n    res.send(String(req.heade"
+    },
+    {
+      "file": "test/express.urlencoded.js",
+      "function_name": "expectKeyCount",
+      "start_line": 824,
+      "end_line": 828,
+      "line_count": 5,
+      "has_docstring": false,
+      "code_preview": "function expectKeyCount (count) {\n  return function (res) {\n    assert.strictEqual(Object.keys(JSON.parse(res.text)).length, count)\n  }\n}"
+    },
+    {
+      "file": "test/req.ip.js",
+      "function_name": "getExpectedClientAddress",
+      "start_line": 109,
+      "end_line": 113,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function getExpectedClientAddress(server) {\n  return server.address().address === '::'\n    ? '::ffff:127.0.0.1'\n    : '127.0.0.1';\n}"
+    },
+    {
+      "file": "test/req.query.js",
+      "function_name": "createApp",
+      "start_line": 94,
+      "end_line": 106,
+      "line_count": 13,
+      "has_docstring": false,
+      "code_preview": "function createApp(setting) {\n  var app = express();\n\n  if (setting !== undefined) {\n    app.set('query parser', setting);\n  }\n\n  app.use(function (req, res) {\n    res.send(req.query);\n  });\n\n  return"
+    },
+    {
+      "file": "test/res.append.js",
+      "function_name": "shouldHaveHeaderValues",
+      "start_line": 107,
+      "end_line": 116,
+      "line_count": 10,
+      "has_docstring": false,
+      "code_preview": "function shouldHaveHeaderValues (key, values) {\n  return function (res) {\n    var headers = res.headers[key.toLowerCase()]\n    assert.ok(headers, 'should have header \"' + key + '\"')\n    assert.strictE"
+    },
+    {
+      "file": "test/res.format.js",
+      "function_name": "test",
+      "start_line": 182,
+      "end_line": 248,
+      "line_count": 67,
+      "has_docstring": false,
+      "code_preview": "function test(app) {\n  it('should utilize qvalues in negotiation', function(done){\n    request(app)\n    .get('/')\n    .set('Accept', 'text/html; q=.5, application/json, */*; q=.1')\n    .expect({\"messa"
+    },
+    {
+      "file": "test/res.render.js",
+      "function_name": "createApp",
+      "start_line": 361,
+      "end_line": 367,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function createApp() {\n  var app = express();\n\n  app.engine('.tmpl', tmpl);\n\n  return app;\n}"
+    },
+    {
+      "file": "test/res.sendFile.js",
+      "function_name": "createApp",
+      "start_line": 905,
+      "end_line": 913,
+      "line_count": 9,
+      "has_docstring": false,
+      "code_preview": "function createApp(path, options, fn) {\n  var app = express();\n\n  app.use(function (req, res) {\n    res.sendFile(path, options, fn);\n  });\n\n  return app;\n}"
+    },
+    {
+      "file": "test/support/tmpl.js",
+      "function_name": "exports",
+      "start_line": 5,
+      "end_line": 23,
+      "line_count": 19,
+      "has_docstring": false,
+      "code_preview": "module.exports = function renderFile(fileName, options, callback) {\n  function onReadFile(err, str) {\n    if (err) {\n      callback(err);\n      return;\n    }\n\n    try {\n      str = str.replace(variabl"
+    },
+    {
+      "file": "test/support/tmpl.js",
+      "function_name": "generateVariableLookup",
+      "start_line": 25,
+      "end_line": 36,
+      "line_count": 12,
+      "has_docstring": false,
+      "code_preview": "function generateVariableLookup(data) {\n  return function variableLookup(str, path) {\n    var parts = path.split('.');\n    var value = data;\n\n    for (var i = 0; i < parts.length; i++) {\n      value ="
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "shouldHaveBody",
+      "start_line": 28,
+      "end_line": 36,
+      "line_count": 9,
+      "has_docstring": true,
+      "code_preview": "function shouldHaveBody (buf) {\n  return function (res) {\n    var body = !Buffer.isBuffer(res.body)\n      ? Buffer.from(res.text)\n      : res.body\n    assert.ok(body, 'response has body')\n    assert.s"
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "shouldHaveHeader",
+      "start_line": 45,
+      "end_line": 49,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function shouldHaveHeader (header) {\n  return function (res) {\n    assert.ok((header.toLowerCase() in res.headers), 'should have header ' + header)\n  }\n}"
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "shouldNotHaveBody",
+      "start_line": 57,
+      "end_line": 61,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function shouldNotHaveBody () {\n  return function (res) {\n    assert.ok(res.text === '' || res.text === undefined)\n  }\n}"
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "shouldNotHaveHeader",
+      "start_line": 69,
+      "end_line": 73,
+      "line_count": 5,
+      "has_docstring": true,
+      "code_preview": "function shouldNotHaveHeader(header) {\n  return function (res) {\n    assert.ok(!(header.toLowerCase() in res.headers), 'should not have header ' + header);\n  };\n}"
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "getMajorVersion",
+      "start_line": 75,
+      "end_line": 77,
+      "line_count": 3,
+      "has_docstring": false,
+      "code_preview": "function getMajorVersion(versionString) {\n  return versionString.split('.')[0];\n}"
+    },
+    {
+      "file": "test/support/utils.js",
+      "function_name": "shouldSkipQuery",
+      "start_line": 79,
+      "end_line": 85,
+      "line_count": 7,
+      "has_docstring": false,
+      "code_preview": "function shouldSkipQuery(versionString) {\n  // Skipping HTTP QUERY tests below Node 22, QUERY wasn't fully supported by Node until 22\n  // we could update this implementation to run on supported versi"
+    }
+  ]
+}

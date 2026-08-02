@@ -73,15 +73,17 @@ def _extract_from_node(
     container=None,
 ) -> list[Chunk]:
     if node.type in {"export_statement", "export_default_declaration"}:
-        declaration = node.child_by_field_name("declaration")
-        if declaration is None:
-            return []
-        return _extract_from_node(
-            declaration,
-            source_bytes,
-            file_path,
-            container=node,
-        )
+        chunks: list[Chunk] = []
+        for child in node.named_children:
+            chunks.extend(
+                _extract_from_node(
+                    child,
+                    source_bytes,
+                    file_path,
+                    container=node,
+                )
+            )
+        return chunks
 
     statement = container or node
 
@@ -103,6 +105,49 @@ def _extract_from_node(
             if not name:
                 continue
             chunks.append(_chunk_from_node(statement, source_bytes, file_path, name))
+        return chunks
+
+    if node.type == "expression_statement":
+        assignment = node.named_children[0] if node.named_children else None
+        if assignment is None or assignment.type != "assignment_expression":
+            return []
+
+        left = assignment.child_by_field_name("left")
+        right = assignment.child_by_field_name("right")
+        if left is None or left.type != "member_expression":
+            return []
+        if right is None or right.type not in {"function_expression", "arrow_function"}:
+            return []
+
+        name = _name_from_member_assignment(left, source_bytes)
+        if name is None:
+            return []
+        return [_chunk_from_node(statement, source_bytes, file_path, name)]
+
+    if node.type == "assignment_expression":
+        left = node.child_by_field_name("left")
+        right = node.child_by_field_name("right")
+        if left is None or left.type != "member_expression":
+            return []
+        if right is None or right.type not in {"function_expression", "arrow_function"}:
+            return []
+
+        name = _name_from_member_assignment(left, source_bytes)
+        if name is None:
+            return []
+        return [_chunk_from_node(statement, source_bytes, file_path, name)]
+
+    if node.type == "parenthesized_expression":
+        chunks: list[Chunk] = []
+        for child in node.named_children:
+            chunks.extend(
+                _extract_from_node(
+                    child,
+                    source_bytes,
+                    file_path,
+                    container=container,
+                )
+            )
         return chunks
 
     if node.type == "class_declaration":
@@ -173,3 +218,50 @@ def _node_text(node, source_bytes: bytes) -> str | None:
     if node is None:
         return None
     return source_bytes[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+
+
+def _name_from_member_assignment(member, source_bytes: bytes) -> str | None:
+    """Build a stable function name from assignment target member expression."""
+    path = _member_path(member, source_bytes)
+    if not path:
+        return None
+
+    # exports.foo / module.exports.foo should map to bare callable names.
+    if path[0] == "exports":
+        return path[-1]
+    if len(path) >= 2 and path[0] == "module" and path[1] == "exports":
+        return path[-1]
+
+    if "prototype" in path:
+        cleaned = [part for part in path if part != "prototype"]
+        if len(cleaned) < 2:
+            return None
+        return f"{cleaned[0]}.{cleaned[-1]}"
+
+    return path[-1]
+
+
+def _member_path(member, source_bytes: bytes) -> list[str] | None:
+    """Return member path parts, e.g. Router.prototype.dispatch."""
+    parts: list[str] = []
+    current = member
+
+    while current is not None and current.type == "member_expression":
+        property_node = current.child_by_field_name("property")
+        if property_node is None:
+            return None
+        property_name = _node_text(property_node, source_bytes)
+        if not property_name:
+            return None
+        parts.append(property_name)
+        current = current.child_by_field_name("object")
+
+    if current is None:
+        return None
+
+    object_name = _node_text(current, source_bytes)
+    if not object_name:
+        return None
+    parts.append(object_name)
+    parts.reverse()
+    return parts
