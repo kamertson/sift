@@ -17,5 +17,6 @@ htmlcov/
 
 # Sift outputs
 out/
+out_*.json
 dataset.jsonl
 report.json
