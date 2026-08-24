@@ -44,6 +44,7 @@ def build_comparison_table(report_a: dict[str, Any], report_b: dict[str, Any], *
         f"{'total_chunks':<25} {fmt_value(report_a.get('total_chunks')):<20} {fmt_value(report_b.get('total_chunks')):<20} {'':<12}",
         f"{'test_chunks_excluded':<25} {fmt_value(report_a.get('test_chunks_excluded')):<20} {fmt_value(report_b.get('test_chunks_excluded')):<20} {'':<12}",
         f"{'test_chunk_ratio':<25} {fmt_value(report_a.get('test_chunk_ratio')):<20} {fmt_value(report_b.get('test_chunk_ratio')):<20} {'':<12}",
+        f"{'unscored_language_chunks':<25} {fmt_value(report_a.get('unscored_language_chunks', 0)):<20} {fmt_value(report_b.get('unscored_language_chunks', 0)):<20} {'':<12}",
         f"{'score_distribution.min':<25} {fmt_value(a_dist.get('min')):<20} {fmt_value(b_dist.get('min')):<20} {'':<12}",
         f"{'score_distribution.max':<25} {fmt_value(a_dist.get('max')):<20} {fmt_value(b_dist.get('max')):<20} {'':<12}",
         f"{'score_distribution.mean':<25} {fmt_value(a_dist.get('mean')):<20} {fmt_value(b_dist.get('mean')):<20} {delta('mean'):<12}",

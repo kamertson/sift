@@ -40,6 +40,7 @@ def write_outputs(
     output_dir: str | Path,
     *,
     test_chunks_excluded: int = 0,
+    unscored_language_chunks: int = 0,
 ) -> tuple[Path, Path]:
     """Write ``dataset.jsonl`` and ``report.json`` under *output_dir*.
 
@@ -49,6 +50,11 @@ def write_outputs(
     Args:
         scored: Ranked scored chunks.
         output_dir: Directory to create/write into.
+        test_chunks_excluded: Count of test chunks skipped (when tests are
+            excluded from scoring).
+        unscored_language_chunks: Count of chunks extracted from languages
+            that have no scorers yet (e.g. JS/TS) and were therefore left
+            out of the ranked dataset.
 
     Returns:
         Paths to the written ``dataset.jsonl`` and ``report.json`` files.
@@ -63,7 +69,11 @@ def write_outputs(
         for item in scored:
             handle.write(json.dumps(item.to_record(), ensure_ascii=False) + "\n")
 
-    report = build_report(scored, test_chunks_excluded=test_chunks_excluded)
+    report = build_report(
+        scored,
+        test_chunks_excluded=test_chunks_excluded,
+        unscored_language_chunks=unscored_language_chunks,
+    )
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return dataset_path, report_path
 
@@ -72,14 +82,16 @@ def build_report(
     scored: Sequence[ScoredChunk],
     *,
     test_chunks_excluded: int = 0,
+    unscored_language_chunks: int = 0,
 ) -> dict[str, Any]:
     """Build summary statistics and top/bottom exemplars for *scored*."""
-    total_extracted = len(scored) + test_chunks_excluded
+    total_extracted = len(scored) + test_chunks_excluded + unscored_language_chunks
     if not scored:
         return {
             "total_chunks": 0,
             "test_chunks_excluded": test_chunks_excluded,
             "test_chunk_ratio": _round_ratio(test_chunks_excluded, total_extracted),
+            "unscored_language_chunks": unscored_language_chunks,
             "score_distribution": {"min": None, "max": None, "mean": None, "median": None},
             "top_5_highest": [],
             "top_5_lowest": [],
@@ -100,6 +112,7 @@ def build_report(
         "total_chunks": n,
         "test_chunks_excluded": test_chunks_excluded,
         "test_chunk_ratio": _round_ratio(test_chunks_excluded, total_extracted),
+        "unscored_language_chunks": unscored_language_chunks,
         "small_sample_warning": (
             "Fewer than 10 chunks scored; top/bottom exemplars are limited to "
             f"{k} each to avoid overlap and may not be statistically meaningful."

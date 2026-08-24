@@ -8,10 +8,33 @@ import click
 
 from sift import __version__
 from sift.compare import build_comparison_table, load_report
-from sift.extract import extract_chunks_from_file, is_test_chunk
+from sift.extract import is_test_chunk
 from sift.ingest import ingest
+from sift.language import extract_chunks_for_file
 from sift.output import scored_chunk_from_scores, write_outputs
 from sift.scoring import ComplexityScorer, LintScorer, aggregate_scores
+
+_LANGUAGE_CHOICES = ("python", "javascript", "typescript")
+
+
+def _parse_languages(
+    _ctx: click.Context,
+    _param: click.Parameter,
+    value: tuple[str, ...],
+) -> set[str]:
+    """Accept repeatable ``--languages`` flags and/or comma-separated values."""
+    languages: set[str] = set()
+    for item in value:
+        for part in item.split(","):
+            language = part.strip().lower()
+            if not language:
+                continue
+            if language not in _LANGUAGE_CHOICES:
+                raise click.BadParameter(
+                    f"invalid language {language!r}; choose from {', '.join(_LANGUAGE_CHOICES)}"
+                )
+            languages.add(language)
+    return languages or {"python"}
 
 
 @click.group()
@@ -39,23 +62,43 @@ def main() -> None:
     default=False,
     help="Include test chunks in scoring instead of excluding them by default.",
 )
-def scan(path: Path, output_dir: Path, include_tests: bool) -> None:
+@click.option(
+    "--languages",
+    "-L",
+    multiple=True,
+    default=("python",),
+    show_default=True,
+    callback=_parse_languages,
+    help=(
+        "Languages to extract (repeatable or comma-separated): "
+        "python, javascript, typescript. JS/TS chunks are extracted but not "
+        "scored until language-specific scorers exist."
+    ),
+)
+def scan(path: Path, output_dir: Path, include_tests: bool, languages: set[str]) -> None:
     """Scan PATH, score function chunks, and write ranked dataset outputs."""
-    root, python_files = ingest(path)
-    click.echo(f"Scanning {root} ({len(python_files)} Python file(s))...")
+    root, source_files = ingest(path, languages=languages)
+    click.echo(f"Scanning {root} ({len(source_files)} source file(s))...")
 
     scorers = [ComplexityScorer(), LintScorer()]
     lint_scorer = next(s for s in scorers if isinstance(s, LintScorer))
     scored = []
     excluded_test_chunks = 0
+    unscored_language_chunks = 0
 
-    for file_path in python_files:
+    for file_path in source_files:
         relative = str(file_path.relative_to(root))
-        # Prime lint diagnostics against the real file (with full import/class
-        # context) once per file, rather than re-running ruff per isolated
-        # chunk — see LintScorer docstring for why this matters for accuracy.
-        lint_scorer.prime_file(file_path, relative)
-        for chunk in extract_chunks_from_file(file_path, relative_to=root):
+        is_python = file_path.suffix.lower() == ".py"
+
+        # Python-only scorers (radon/ruff) must not see JS/TS — they would
+        # silently return garbage scores rather than failing loudly.
+        if is_python:
+            lint_scorer.prime_file(file_path, relative)
+
+        for chunk in extract_chunks_for_file(file_path, relative_to=root):
+            if not is_python:
+                unscored_language_chunks += 1
+                continue
             if not include_tests and is_test_chunk(chunk):
                 excluded_test_chunks += 1
                 continue
@@ -67,9 +110,15 @@ def scan(path: Path, output_dir: Path, include_tests: bool) -> None:
         scored,
         output_dir,
         test_chunks_excluded=excluded_test_chunks,
+        unscored_language_chunks=unscored_language_chunks,
     )
 
     click.echo(f"Scored {len(scored)} chunk(s).")
+    if unscored_language_chunks:
+        click.echo(
+            f"Extracted but not yet scored: {unscored_language_chunks} JS/TS "
+            "chunk(s) (no JS scorers yet)."
+        )
     click.echo(f"Wrote {dataset_path}")
     click.echo(f"Wrote {report_path}")
 
