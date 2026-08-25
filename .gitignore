@@ -14,9 +14,13 @@ venv/
 .mypy_cache/
 .coverage
 htmlcov/
+node_modules/
 
 # Sift outputs
 out/
+out_*/
+.sift-eslint-*/
+sift-eslint-*/
 out_*.json
 dataset.jsonl
 report.json
